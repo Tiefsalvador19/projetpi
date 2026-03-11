@@ -671,9 +671,6 @@
             throw new Error('Navigateur non autorisé. Utilisez Chrome, Edge ou Opera.');
         }
 
-        // Configuration sécurisée
-        const correctPassword = "";
-
         // Empêcher l'impression
         window.onbeforeprint = function() {
             alert("L'impression est désactivée pour ce document sécurisé.");
