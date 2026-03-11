@@ -1,4 +1,666 @@
-<script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Système Éducatif Interactif π - Dossier de Présentation</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .login-form button:hover {
+            background-color: #2980b9;
+        }
+        
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .warning-message {
+            background-color: #feeceb;
+            border-left: 4px solid var(--accent-color);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+            overflow-y: auto;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            margin-bottom: 1rem;
+            margin-left: 2rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .copyright {
+            font-size: 0.9rem;
+        }
+        
+        .contact-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f2f2f2;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .anti-copy {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        @media screen and (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.75rem;
+            }
+            
+            h3 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-container">
+            <h2>Accès Sécurisé</h2>
+            <div class="warning-message">
+                Ce document est protégé et confidentiel. Toute tentative d'accès non autorisé est interdite et pourrait entraîner des poursuites.
+            </div>
+            <form class="login-form" id="loginForm">
+                <input type="password" id="passwordInput" placeholder="Mot de passe" required>
+                <button type="submit">Accéder au document</button>
+                <p class="error-message" id="errorMessage">Mot de passe incorrect. Veuillez réessayer.</p>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container anti-copy" id="documentContainer">
+        <header>
+            <h1>Projet de Système Éducatif Interactif π</h1>
+            <p>Dossier de présentation pour financement</p>
+        </header>
+        
+        <section>
+            <h2>RÉSUMÉ EXÉCUTIF</h2>
+            <p>Le système π est une innovation technologique éducative conçue pour transformer l'expérience d'apprentissage en salle de classe. En combinant reconnaissance faciale, projection multimédia et interactivité, π répond aux défis actuels de l'éducation : suivi des présences, engagement des élèves et intégration des technologies numériques dans l'enseignement.</p>
+            <p>Ce prototype fonctionnel démontre la faisabilité du concept et permettra, avec un financement adéquat, de développer une solution complète déployable à grande échelle dans les établissements d'enseignement.</p>
+        </section>
+        
+        <section>
+            <h2>1. PRÉSENTATION DU PROJET</h2>
+            
+            <h3>1.1 Vision</h3>
+            <p>Transformer les salles de classe traditionnelles en environnements d'apprentissage intelligents et interactifs, où la technologie renforce l'engagement des élèves et allège la charge administrative des enseignants.</p>
+            
+            <h3>1.2 Mission</h3>
+            <p>Concevoir, développer et déployer un système technologique abordable qui:</p>
+            <ul>
+                <li>Automatise le suivi des présences</li>
+                <li>Enrichit l'expérience pédagogique par le multimédia</li>
+                <li>Favorise l'apprentissage interactif</li>
+                <li>S'intègre harmonieusement aux pratiques d'enseignement existantes</li>
+            </ul>
+            
+            <h3>1.3 Équipe de projet</h3>
+            <p>Ouraga Ange Michel, chef de projet de la Startup DLD (Pb Souriante), informaticien, développeur d'applications et web, soutenu par des conseillers techniques et pédagogiques:</p>
+            <ul>
+                <li>Kouabena Philippe Eliora, N'dia Grâce Emmanuella en sciences économiques...</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>2. ANALYSE DU BESOIN</h2>
+            
+            <h3>2.1 Défis actuels dans l'éducation</h3>
+            <ul>
+                <li><strong>Gestion administrative chronophage</strong>: Les enseignants consacrent une part importante de leur temps à des tâches administratives comme l'appel.</li>
+                <li><strong>Engagement limité des élèves</strong>: Les méthodes traditionnelles peinent à capter l'attention des élèves de la génération numérique.</li>
+                <li><strong>Difficulté d'intégration des ressources numériques</strong>: Malgré leur potentiel pédagogique, les outils numériques restent souvent sous-exploités.</li>
+                <li><strong>Continuité pédagogique</strong>: Besoin de solutions pour maintenir l'engagement même en période d'absentéisme ou d'enseignement à distance.</li>
+            </ul>
+            
+            <h3>2.2 Public cible</h3>
+            <ul>
+                <li>Établissements d'enseignement secondaire et supérieur</li>
+                <li>Centres de formation professionnelle</li>
+                <li>Structures éducatives publiques et privées</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>3. DESCRIPTION TECHNIQUE DU SYSTÈME π</h2>
+            
+            <h3>3.1 Composantes principales</h3>
+            
+            <h4>3.1.1 Module de reconnaissance faciale</h4>
+            <ul>
+                <li>Identification automatique des élèves/étudiants en entrée de classe</li>
+                <li>Enregistrement des présences dans une base de données sécurisée</li>
+                <li>Génération de rapports de présence accessibles aux enseignants et administration</li>
+            </ul>
+            
+            <h4>3.1.2 Système de projection multimédia</h4>
+            <ul>
+                <li>Projecteur HD intégré</li>
+                <li>Diffusion automatique ou à la demande de contenu pédagogique</li>
+                <li>Synchronisation avec le programme de cours</li>
+            </ul>
+            
+            <h4>3.1.3 Interface interactive</h4>
+            <ul>
+                <li>Fonctionnalités de quiz et sondages en temps réel</li>
+                <li>Système de questions/réponses pendant le cours</li>
+                <li>Activités pédagogiques interactives</li>
+            </ul>
+            
+            <h4>3.1.4 Plateforme de gestion pour enseignants</h4>
+            <ul>
+                <li>Interface web intuitive</li>
+                <li>Gestion des contenus pédagogiques</li>
+                <li>Accès aux données de présence et de participation</li>
+            </ul>
+            
+            <h3>3.2 Architecture technique</h3>
+            <ul>
+                <li><strong>Matériel</strong>: Unité centrale (Raspberry Pi), caméra HD, projecteur, microphone, haut-parleurs</li>
+                <li><strong>Logiciel</strong>: Système basé sur Linux, algorithmes de reconnaissance faciale (OpenCV), interface web, base de données</li>
+                <li><strong>Connectivité</strong>: Wi-Fi, Bluetooth, ports USB pour extensions</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>4. AVANTAGES ET IMPACT</h2>
+            
+            <h3>4.1 Pour les enseignants</h3>
+            <ul>
+                <li>Réduction de 95% du temps consacré à l'appel et aux tâches administratives</li>
+                <li>Enrichissement du matériel pédagogique disponible</li>
+                <li>Accès à des données objectives sur l'engagement des élèves</li>
+                <li>Facilitation de l'évaluation continue</li>
+            </ul>
+            
+            <h3>4.2 Pour les élèves</h3>
+            <ul>
+                <li>Expérience d'apprentissage plus engageante et interactive</li>
+                <li>Accès à des ressources multimédias pertinentes</li>
+                <li>Participation accrue via les fonctionnalités interactives</li>
+                <li>Familiarisation avec les technologies numériques</li>
+            </ul>
+            
+            <h3>4.3 Pour les établissements</h3>
+            <ul>
+                <li>Modernisation de l'infrastructure éducative</li>
+                <li>Amélioration des taux de présence et de réussite</li>
+                <li>Collecte de données pour l'amélioration continue des méthodes pédagogiques</li>
+                <li>Image d'innovation et d'excellence</li>
+            </ul>
+            
+            <h3>4.4 Impact social</h3>
+            <ul>
+                <li>Réduction des inégalités d'accès aux technologies éducatives</li>
+                <li>Préparation des élèves aux compétences numériques du 21ème siècle</li>
+                <li>Amélioration des résultats scolaires dans les zones défavorisées</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>5. ÉTAT ACTUEL ET PROTOTYPE</h2>
+            
+            <h3>5.1 État d'avancement du projet</h3>
+            <ul>
+                <li>Conception détaillée finalisée</li>
+                <li>Premier prototype fonctionnel développé avec:
+                    <ul>
+                        <li>Matériel: Raspberry Pi 4, webcam HD, mini-projecteur</li>
+                        <li>Logiciel: Système de reconnaissance faciale basique, interface web simple</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <h3>5.2 Démonstration du prototype</h3>
+            <ul>
+                <li>[Photos du prototype actuel]</li>
+                <li>Fonctionnalités actuellement opérationnelles:
+                    <ul>
+                        <li>Reconnaissance faciale basique</li>
+                        <li>Projection de contenu multimédia</li>
+                        <li>Interface utilisateur web pour les enseignants</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <h3>5.3 Retours préliminaires</h3>
+            <ul>
+                <li>Tests effectués dans [nombre] classes</li>
+                <li>Retours positifs des enseignants sur [points spécifiques]</li>
+                <li>Axes d'amélioration identifiés: [liste]</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>6. PLAN DE DÉVELOPPEMENT</h2>
+            
+            <h3>6.1 Phases de développement</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Durée</th>
+                        <th>Activités clés</th>
+                        <th>Livrables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>3 mois</td>
+                        <td>Perfectionnement de l'algorithme de reconnaissance faciale</td>
+                        <td>Système de reconnaissance fiable (>95%)</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>2 mois</td>
+                        <td>Développement de l'interface interactive</td>
+                        <td>Plateforme avec quiz, Q&R</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>2 mois</td>
+                        <td>Intégration des modules et tests</td>
+                        <td>Système complet fonctionnel</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>3 mois</td>
+                        <td>Pilote dans 5 établissements</td>
+                        <td>Rapport d'évaluation</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>6.2 Calendrier prévisionnel</h3>
+            <p>[DIAGRAMME DE GANTT À INSÉRER]</p>
+        </section>
+        
+        <section>
+            <h2>7. BUDGET DÉTAILLÉ</h2>
+            
+            <h3>7.1 Coûts de développement</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Montant (FCFA)</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Matériel pour prototypes avancés</td>
+                        <td>1.500.000</td>
+                        <td>Composants de qualité professionnelle</td>
+                    </tr>
+                    <tr>
+                        <td>Développement logiciel</td>
+                        <td>3.000.000</td>
+                        <td>Programmation, tests, débogage</td>
+                    </tr>
+                    <tr>
+                        <td>Design et ergonomie</td>
+                        <td>1.000.000</td>
+                        <td>Interface utilisateur, boîtier</td>
+                    </tr>
+                    <tr>
+                        <td>Tests et certifications</td>
+                        <td>1.500.000</td>
+                        <td>Conformité, sécurité, performance</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>7.2 Coûts de déploiement pilote</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Montant (FCFA)</th>
+                        <th>Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Production de 10 unités</td>
+                        <td>5.000.000</td>
+                        <td>Fabrication, assemblage, contrôle qualité</td>
+                    </tr>
+                    <tr>
+                        <td>Installation et formation</td>
+                        <td>1.500.000</td>
+                        <td>Dans 5 établissements pilotes</td>
+                    </tr>
+                    <tr>
+                        <td>Support et maintenance (1 an)</td>
+                        <td>1.000.000</td>
+                        <td>Assistance technique, mises à jour</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>7.3 Financement demandé</h3>
+            <p><strong>Total du financement demandé: 14.500.000 FCFA</strong></p>
+            
+            <h3>7.4 Utilisation des fonds</h3>
+            <ul>
+                <li>45% - Développement technique</li>
+                <li>35% - Production et déploiement</li>
+                <li>10% - Tests et validation</li>
+                <li>10% - Gestion de projet et administration</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>8. MODÈLE ÉCONOMIQUE ET DURABILITÉ</h2>
+            
+            <h3>8.1 Modèle économique proposé</h3>
+            
+            <h4>8.1.1 Option 1: Vente directe aux établissements</h4>
+            <ul>
+                <li>Prix unitaire estimé: 750.000 FCFA</li>
+                <li>Services annuels (maintenance, mises à jour): 150.000 FCFA/an</li>
+            </ul>
+            
+            <h4>8.1.2 Option 2: Location avec services</h4>
+            <ul>
+                <li>Abonnement annuel: 300.000 FCFA/an/unité</li>
+                <li>Tout inclus: matériel, logiciel, maintenance, formations</li>
+            </ul>
+            
+            <h3>8.2 Marché potentiel</h3>
+            <ul>
+                <li>Côte d'Ivoire: Environ 5.000 établissements d'enseignement secondaire et supérieur</li>
+                <li>Région UEMOA: 20.000 établissements</li>
+                <li>Potentiel d'expansion internationale: Pays voisins (Burkina Faso, Mali, Ghana)</li>
+            </ul>
+            
+            <h3>8.3 Projections financières (5 ans)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Année</th>
+                        <th>Unités vendues/louées</th>
+                        <th>Chiffre d'affaires (FCFA)</th>
+                        <th>Rentabilité</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>20</td>
+                        <td>15.000.000</td>
+                        <td>-5.000.000</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>50</td>
+                        <td>37.500.000</td>
+                        <td>5.000.000</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>100</td>
+                        <td>75.000.000</td>
+                        <td>20.000.000</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>200</td>
+                        <td>150.000.000</td>
+                        <td>45.000.000</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>350</td>
+                        <td>262.500.000</td>
+                        <td>85.000.000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>9. ANALYSE DES RISQUES ET MITIGATIONS</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Risque</th>
+                        <th>Probabilité</th>
+                        <th>Impact</th>
+                        <th>Stratégie de mitigation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Problèmes techniques de reconnaissance faciale</td>
+                        <td>Moyenne</td>
+                        <td>Élevé</td>
+                        <td>Développer des alternatives (QR codes, cartes RFID)</td>
+                    </tr>
+                    <tr>
+                        <td>Préoccupations concernant la vie privée</td>
+                        <td>Élevée</td>
+                        <td>Élevé</td>
+                        <td>Strict respect RGPD, chiffrement des données, options d'opt-out</td>
+                    </tr>
+                    <tr>
+                        <td>Résistance au changement</td>
+                        <td>Moyenne</td>
+                        <td>Moyen</td>
+                        <td>Formation des enseignants, démonstration des bénéfices</td>
+                    </tr>
+                    <tr>
+                        <td>Coût trop élevé pour certains établissements</td>
+                        <td>Élevée</td>
+                        <td>Moyen</td>
+                        <td>Développer différentes options tarifaires, rechercher subventions</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>10. PARTENARIATS POTENTIELS</h2>
+            <ul>
+                <li><strong>Ministère de l'Éducation Nationale</strong>: Validation pédagogique, accès aux établissements</li>
+                <li><strong>Opérateurs télécom</strong>: Connectivité, distribution</li>
+                <li><strong>Fabricants de matériel informatique</strong>: Production à l'échelle</li>
+                <li><strong>ONG éducatives</strong>: Déploiement dans zones défavorisées</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h2>11. CONCLUSION</h2>
+            <p>Le système π représente une opportunité unique de moderniser l'enseignement et d'améliorer l'expérience éducative tant pour les enseignants que pour les élèves. Notre prototype fonctionnel démontre la faisabilité technique du concept, et avec votre soutien financier, nous pouvons transformer cette vision en une solution déployable à grande échelle.</p>
+            <p>Nous sollicitons votre soutien pour un financement de 14.500.000 FCFA afin de développer pleinement cette technologie et démontrer son impact dans des établissements pilotes.</p>
+        </section>
+        
+        <section>
+            <h2>ANNEXES</h2>
+            <h3>Annexe A: CV des membres de l'équipe</h3>
+            <h3>Annexe B: Spécifications techniques détaillées</h3>
+            <h3>Annexe C: Photos et schémas du prototype</h3>
+            <h3>Annexe D: Témoignages préliminaires</h3>
+            <h3>Annexe E: Études de marché</h3>
+        </section>
+        
+        <section class="contact-info">
+            <h2>CONTACT</h2>
+            <p><strong>Ouraga Ange Michel</strong></p>
+            <p>Téléphone: +225 0151185932</p>
+            <p>Email: <a href="mailto:ouragaangemichel@outlook.com">ouragaangemichel@outlook.com</a></p>
+            <p>Adresse: Côte d'Ivoire, Abidjan-Cocody, Cité des Arts, 56 logements</p>
+        </section>
+        
+        <footer>
+            <p class="copyright">© 2025 Ouraga Ange Michel - Tous droits réservés</p>
+            <p>Ce document est protégé et confidentiel. Toute reproduction non autorisée est strictement interdite.</p>
+        </footer>
+    </div>
+    
+    <script>
 
 // =============================
 // CONFIGURATION
@@ -163,3 +825,6 @@ window.onload = function(){
 };
 
 </script>
+
+</body>
+</html>
