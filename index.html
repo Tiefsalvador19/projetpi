@@ -661,170 +661,103 @@
     </div>
     
     <script>
-
-// =============================
-// CONFIGURATION
-// =============================
-
-// SHA-256 du mot de passe "Eliora19"
-const PASSWORD_HASH = "0f0b6a8c6e6c9c5f1d5f0e66db8a7e6a9a9d1e5a3c7d7d89e5a2a9f93f3c2a0f";
-
-const MAX_ATTEMPTS = 5;
-const LOCK_TIME = 300000; // 5 minutes
-const SESSION_TIMEOUT = 600000; // 10 minutes
-
-let attempts = 0;
-
-
-// =============================
-// HASH PASSWORD
-// =============================
-
-async function hashPassword(password) {
-
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-    const hashHex = hashArray
-        .map(b => b.toString(16).padStart(2,"0"))
-        .join("");
-
-    return hashHex;
-}
-
-
-// =============================
-// LOGIN SYSTEM
-// =============================
-
-document.getElementById("loginForm").addEventListener("submit", async function(e){
-
-    e.preventDefault();
-
-    const password = document.getElementById("passwordInput").value;
-
-    if(localStorage.getItem("lockedUntil")){
-
-        const lockedUntil = parseInt(localStorage.getItem("lockedUntil"));
-
-        if(Date.now() < lockedUntil){
-
-            alert("Trop de tentatives. Réessayez plus tard.");
-            return;
+        // Vérifier que le document est chargé dans Chrome, Edge ou Opera
+        const ua = navigator.userAgent.toLowerCase();
+        const isChrome = ua.includes('chrome') && !ua.includes('edg');
+        const isEdge = ua.includes('edg');
+        const isOpera = ua.includes('opr');
+        if (!isChrome && !isEdge && !isOpera) {
+            document.body.innerHTML = '<h1>Navigateur non autorisé</h1><p>Ce document ne peut être ouvert que dans Google Chrome, Microsoft Edge ou Opera.</p>';
+            throw new Error('Navigateur non autorisé. Utilisez Chrome, Edge ou Opera.');
         }
 
-        localStorage.removeItem("lockedUntil");
-    }
+        // Empêcher l'impression
+        window.onbeforeprint = function() {
+            alert("L'impression est désactivée pour ce document sécurisé.");
+            return false;
+        };
 
-    const hashed = await hashPassword(password);
+        // Empêcher la capture d'écran et certaines combinaisons de touches
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen' || 
+                (e.ctrlKey && (e.key === 'p' || e.key === 'c' || e.key === 'v')) ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c'))) {
+                e.preventDefault();
+                alert("La capture d'écran, l'impression et l'inspection sont désactivées sur ce document sécurisé.");
+                return false;
+            }
+        });
 
-    if(hashed === PASSWORD_HASH){
-
-        document.getElementById("loginOverlay").style.display = "none";
-
-        document.getElementById("documentContainer").style.display = "block";
-
-        document.body.style.overflow = "auto";
-
-        localStorage.setItem("lastActive", Date.now());
-
-        attempts = 0;
-
-    }else{
-
-        attempts++;
-
-        document.getElementById("errorMessage").style.display = "block";
-
-        document.getElementById("passwordInput").value = "";
-
-        if(attempts >= MAX_ATTEMPTS){
-
-            localStorage.setItem("lockedUntil", Date.now() + LOCK_TIME);
-
-            alert("Accès bloqué pendant 5 minutes.");
-
-        }
-    }
-
-});
+        // Désactiver le clic droit
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            alert("Le clic droit est désactivé sur ce document sécurisé.");
+            return false;
+        });
 
 
-// =============================
-// SESSION TIMEOUT
-// =============================
+        // mot de passe en clair
+const correctPassword = "Eliora19";
+        
+        // Désactiver la sélection de texte sauf pour les champs de saisie
+        document.addEventListener('selectstart', function(e) {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
 
-setInterval(function(){
+        // Désactiver le glisser-déposer
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
 
-    const lastActive = localStorage.getItem("lastActive");
+        // Gérer la connexion
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
 
-    if(lastActive && Date.now() - lastActive > SESSION_TIMEOUT){
+            if (password === correctPassword) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('documentContainer').style.display = 'block';
+                document.body.style.overflow = 'auto';
+                localStorage.setItem('lastActive', Date.now());
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        });
 
-        location.reload();
+        // Mettre à jour le timestamp de la session toutes les 30 secondes
+        setInterval(function() {
+            if (document.getElementById('documentContainer').style.display === 'block') {
+                localStorage.setItem('lastActive', Date.now());
+            }
+        }, 30000);
 
-    }
+        // Vérifier l'inactivité toutes les minutes
+        setInterval(function() {
+            const lastActive = localStorage.getItem('lastActive');
+            if (lastActive && Date.now() - parseInt(lastActive) > 600000) {
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('documentContainer').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('passwordInput').value = '';
+                document.body.style.overflow = 'hidden';
+                localStorage.removeItem('lastActive');
+            }
+        }, 60000);
 
-},60000);
+        // Initialiser la session
+        localStorage.setItem('lastActive', Date.now());
 
-
-// =============================
-// ANTI INSPECT / ANTI COPY
-// =============================
-
-// désactiver clic droit
-document.addEventListener("contextmenu", e => e.preventDefault());
-
-// désactiver copier
-document.addEventListener("copy", e => e.preventDefault());
-
-// désactiver inspect
-document.addEventListener("keydown", function(e){
-
-    if(
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key)) ||
-        (e.ctrlKey && e.key === "U")
-    ){
-        e.preventDefault();
-    }
-
-});
-
-
-// =============================
-// ANTI SCREENSHOT BASIQUE
-// =============================
-
-document.addEventListener("keyup", function(e){
-
-    if(e.key === "PrintScreen"){
-
-        navigator.clipboard.writeText("");
-
-        alert("Capture écran désactivée.");
-
-    }
-
-});
-
-
-// =============================
-// INITIALISATION
-// =============================
-
-window.onload = function(){
-
-    document.getElementById("documentContainer").style.display = "none";
-
-    document.getElementById("loginOverlay").style.display = "flex";
-
-};
-
-</script>
-
+        // Empêcher l'accès direct au contenu sans mot de passe
+        window.onload = function() {
+            document.getElementById('documentContainer').style.display = 'none';
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+    </script>
 </body>
 </html>
